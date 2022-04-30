@@ -1,0 +1,50 @@
+// Fonts
+@import url('https://fonts.googleapis.com/css?family=Nunito');
+
+// Variables
+@import 'variables';
+
+// Bootstrap
+@import '~bootstrap/scss/bootstrap';
+
+.sidebar{
+    background-color: rgb(255, 11, 72);
+    width: 22%;
+    min-height: 100vh;
+    position: absolute;
+}
+.main_area{
+    background-color: rgb(14, 11, 219);
+    width:78%;
+    min-height: 100vh;
+    position: absolute;
+    left: 22%;
+}
+.image_container {
+    height: 120px;
+    width: 200px;
+    border-radius: 6px;
+    overflow: hidden;
+    margin: 10px;
+}
+.image_container img {
+    width: auto;
+    object-fit: cover;
+}
+.image_container span {
+    top: -6px;
+    right: 8px;
+    color: red;
+    font-size: 28px;
+    font-weight: normal;
+    cursor: pointer;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type=number] {
+  -moz-appearance: textfield;
+}
