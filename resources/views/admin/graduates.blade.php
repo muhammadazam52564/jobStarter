@@ -43,7 +43,7 @@
                         <th scope="col">Description</th>
                         <th scope="col" style="min-width: 140px">Email verified</th>
                         <th scope="col" style="min-width: 140px">Account Status</th>
-                        <th scope="col" style="min-width: 140px">Action</th>
+                        <th scope="col" style="min-width: 160px">Action</th>
                     </tr>
                 </thead>
                 <tbody id="graduates_list"></tbody>

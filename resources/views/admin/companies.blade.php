@@ -42,7 +42,7 @@
                         <th scope="col">School</th> -->
                         <th scope="col">Verification</th>
                         <th scope="col" style="min-width: 140px">Account Status</th>
-                        <th scope="col">Action</th>
+                        <th scope="col" style="min-width: 160px">Action</th>
                     </tr>
                 </thead>
                 <tbody id="companies_list">
