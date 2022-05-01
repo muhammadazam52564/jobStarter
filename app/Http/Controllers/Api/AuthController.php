@@ -563,7 +563,7 @@ class AuthController extends Controller
 
     public function payment(Request $request)
     {
-        return Payment::all();
+        // return Payment::all();
         try
         {
             $validator = \Validator::make($request->all(), [
