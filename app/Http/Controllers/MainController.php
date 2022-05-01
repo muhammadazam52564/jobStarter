@@ -13,6 +13,8 @@ use App\Models\Notification;
 use App\Models\User;
 use Carbon\Carbon;
 use Redirect;
+use Session;
+use Stripe;
 use URL;
 
 // Admin 1
@@ -94,4 +96,6 @@ class MainController extends Controller
         $companies = User::where('role', 'company')->orderBy('id', 'DESC')->get();
         return $companies;
     }
+
+
 }

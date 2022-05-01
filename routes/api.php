@@ -22,6 +22,8 @@ Route::group(['middleware' => 'auth:sanctum'], function(){
     Route::post('/send_mail', [AuthController::class, 'send_mail']);
     Route::get('/logout/{id}', [AuthController::class, 'signout']);
     Route::get('/notifications/{id}', [AuthController::class, 'notifications']);
+    Route::post('/pay', [AuthController::class, 'payment']);
+
 
 });
 

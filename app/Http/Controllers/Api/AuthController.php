@@ -2,14 +2,17 @@
 
 namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use Illuminate\Support\Str;
-use Carbon\Carbon;
 use Illuminate\Support\Facades\Hash;
-use App\Models\User;
-use App\Mail\OtpMail;
-use App\Mail\ShortListed;
+use Illuminate\Http\Request;
 use App\Models\Notification;
+use Illuminate\Support\Str;
+use App\Mail\ShortListed;
+use App\Models\Payment;
+use App\Mail\OtpMail;
+use App\Models\User;
+use Carbon\Carbon;
+use Stripe;
+
 class AuthController extends Controller
 {
     public function signup(Request $request){
@@ -556,6 +559,78 @@ class AuthController extends Controller
                 ], 200);
             }
         }
+    }
+
+    public function payment(Request $request)
+    {
+        return Payment::all();
+        try
+        {
+            $validator = \Validator::make($request->all(), [
+
+                'company'       => 'required',
+                'card_number'   => 'required',
+                'exp_month'     => 'required|min:1|max:2',
+                'exp_year'      => 'required|min:4|max:4',
+                'cvc'           => 'required|min:3|max:3',
+                'amount'        => 'required',
+                'currency'      => 'required'
+
+            ]);
+            if ($validator->fails()){
+                return response()->json([
+                    'status' => false,
+                    'error' => $validator->errors()->first(),
+                    'data' => null
+                ], 400);
+            }else{
+
+                Stripe\Stripe::setApiKey(env('STRIPE_SECRET'));
+
+                $stripe = new \Stripe\StripeClient(
+                    env('STRIPE_SECRET')
+                );
+                $token = $stripe->tokens->create([
+                    'card' => [
+                    'number'    => $request->card_number,
+                    'exp_month' => $request->exp_month,
+                    'exp_year'  => $request->exp_year,
+                    'cvc'       => $request->cvc,
+                    ],
+                ]);
+
+                $charge = Stripe\Charge::create ([
+                        "amount"        => $request->amount *100,
+                        "currency"      => $request->currency,
+                        "source"        => $token->id,
+                        "description"   => "Subsrciption test payment."
+                ]);
+
+                $res = [
+                    'payment_id'    => $charge->id,
+                    'status'        => $charge->status,
+                    'amount'        => $charge->amount / 100 .' '. $charge->currency
+                ];
+                $payment = new Payment;
+                $payment->company        = $request->company;
+                $payment->transaction_id = $charge->id;
+                $payment->description    = 'Subsrciption payment.';
+                $payment->save();
+                return response()->json([
+                    'status'    => true,
+                    'message'   => "Payment successfully completed",
+                    'data'      => $res
+                ], 200);
+            }
+        }catch(\Exception $e){
+
+            return response()->json([
+                'status'    => false,
+                'error'     => $e->getMessage(),
+                'data'      => null
+            ], 400);
+        }
+
     }
 
 }
