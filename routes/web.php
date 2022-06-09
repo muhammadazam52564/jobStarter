@@ -19,9 +19,7 @@ Route::group(['prefix'=> 'admin', 'middleware'=>['isAdmin', 'auth', 'PreventBack
 
     Route::get('/get-graduates', [MainController::class, 'graduates_list'])->name('admin.get-graduates');
 
-
     Route::get('/del-graduate/{id}', [MainController::class, 'del_graduates'])->name('admin.del-graduate');
-
 
     Route::get('/companies', [MainController::class, 'companies'])->name('admin.companies');
 
@@ -29,6 +27,17 @@ Route::group(['prefix'=> 'admin', 'middleware'=>['isAdmin', 'auth', 'PreventBack
 
     Route::post('/update-status', [MainController::class, 'update_status'])->name('admin.update-status');
 
+    Route::get('/subscriptions',    [MainController::class, 'subscriptions'])->name('admin.subscriptions');
+    Route::get('/add-subscription', [MainController::class, 'add_subscription'])->name('admin.add-subscription');
+    Route::post('/new-subscription',    [MainController::class, 'new_subscription'])->name('admin.new-subscription');
+
+
+    Route::get('/get-subscriptions', [MainController::class, 'subscriptions_list'])->name('admin.get-subscriptions');
+
+    Route::get('/edit-subscription/{id}', [MainController::class, 'edit_subscriptions'])->name('admin.edit-subscription');
+    Route::post('/update-subscription/{id}', [MainController::class, 'update_subscription'])->name('admin.update-subscription');
+
+    Route::get('/del-subscription/{id}', [MainController::class, 'del_subscription'])->name('admin.del-subscription');
 
     //
     // Profile Settings

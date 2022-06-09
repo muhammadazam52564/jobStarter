@@ -3,7 +3,7 @@
 <div class="container">
     <div class="row">
     <div class="col-md-12 py-2 pb-3 d-flex justify-content-between">
-        <h3>Graduates</h3>
+        <h3>Graduates aaaaaaaaa</h3>
     </div>
         <div class="col-md-12 overflow-auto">
             <table class="table" style="min-width: 700px">
@@ -21,7 +21,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                <tr>
+                    <tr>
                     <th scope="">1</th>
                         <td>Muhammad</td>
                         <td>Muhammad@gmail.com</td>

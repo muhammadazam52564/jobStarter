@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 use App\Mail\AccountApproved;
 use App\Models\Notification;
+use App\Models\Subscription;
 use App\Models\User;
 use Carbon\Carbon;
 use Redirect;
@@ -30,14 +31,10 @@ use URL;
 
 class MainController extends Controller
 {
-
-
-
     public function graduates(Request $request)
     {
         return view('admin.graduates');
     }
-
 
     public function graduates_list(Request $request)
     {
@@ -97,5 +94,91 @@ class MainController extends Controller
         return $companies;
     }
 
+    public function subscriptions(Request $request)
+    {
+        return view('admin.subscriptions');
+    }
+    public function add_subscription(Request $request)
+    {
+        return view('admin.add_subscriptions');
+    }
+    public function new_subscription(Request $request)
+    {
+        // try{
+            $validated = $request->validate([
+                'name'      => 'required',
+                'amount'    => 'required',
+                'duration'  => 'required',
+                'type'      => 'required',
+            ]);
+            $subscription           = new Subscription;
+            $subscription->name     =  $request->name;
+            $subscription->amount   =  $request->amount;
+            $subscription->duration =  $request->duration;
+            $subscription->type     =  $request->type;
+            if ($subscription->save()) 
+            {
+                return redirect()->route('admin.subscriptions');
+            }
+            else
+            {
+                return "failed to save";
+            }
+        // }
+        // catch(\Exception $e){
 
+        //     return response()->json([
+        //         'status'    => false,
+        //         'error'     => $e->getMessage(),
+        //         'data'      => null
+        //     ], 400);
+        // }
+    }
+
+    public function edit_subscriptions($id)
+    {
+        $subscription = Subscription::find($id);
+        return view('admin.edit_subscription', compact('subscription'));
+    }
+
+    public function update_subscription($id, Request $request)
+    {
+        $validated = $request->validate([
+            'name'      => 'required',
+            'amount'    => 'required',
+            'duration'  => 'required',
+            'type'      => 'required',
+        ]);
+        $subscription           =  Subscription::find($id);
+        $subscription->name     =  $request->name;
+        $subscription->amount   =  $request->amount;
+        $subscription->duration =  $request->duration;
+        $subscription->type     =  $request->type;
+        if ($subscription->save()) 
+        {
+            return redirect()->route('admin.subscriptions');
+        }
+        else
+        {
+            return "failed to save";
+        }
+    }
+    
+    public function subscriptions_list(Request $request){
+        $companies = Subscription::orderBy('id', 'DESC')->get();
+        return $companies;
+    }
+
+    public function del_subscription($id){
+        $subscription = Subscription::find($id)->delete();
+        return Redirect::back()->with('msg', 'Subscription deleted Successfully');
+    }
+
+
+
+
+
+    // $table->string('name')->nullable();
+    //         $table->float('amount')->nullable();
+    //         $table->string('duration')->nullable();
 }

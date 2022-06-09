@@ -13,6 +13,12 @@
         <li class="{{ Request::is('admin/companies') ? 'li-active':'' }}">
             <a href="{{ route('admin.companies') }}">Companies</a>
         </li>
+
+        <li class="{{ Request::is('admin/subscriptions') ? 'li-active':'' }}">
+            <a href="{{ route('admin.subscriptions') }}">Subscriptions</a>
+        </li>
+
+
         <li>
             <a href="#ProfileSettings" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Profile Settings</a>
             <ul class="collapse list-unstyled {{ Request::is('admin/change-email') || Request::is('admin/change-password')  ? 'show':'' }}"  id="ProfileSettings">

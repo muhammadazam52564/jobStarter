@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
+use App\Models\Subscription;
 use App\Models\Notification;
 use Illuminate\Support\Str;
 use App\Mail\ShortListed;
@@ -37,8 +38,14 @@ class AuthController extends Controller
                 $user->role     = $request->type;
                 if ($request->type == 'company') {
                     $user->status = 1;
+                    $user->otp      = null;
+                }else{
+                    $user->otp      = 1234;
                 }
-                $user->otp      = 1234;
+                if( $request->has('token')){
+                    $user->token = $request->token;
+                    $user->save();
+                }
 
                 $details = [
                     'title' => 'Email Account Verification',
@@ -131,8 +138,8 @@ class AuthController extends Controller
                 {
                     $user = auth()->user();
                     $token = $user->createToken('my-app-token')->plainTextToken;
-                    if( $request->has('remember_token')){
-                        $user->remember_token = $request->remember_token;
+                    if( $request->has('token')){
+                        $user->token = $request->token;
                         $user->save();
                     }
 
@@ -468,18 +475,18 @@ class AuthController extends Controller
             $notification->content = 'Congratulations you are shot listed by '. $company->name;
             $notification->save();
 
-            // $server_key = env('SERVER_KEY');
-            // $response = Http::withHeaders([
-            //     'Content-Type' => 'application/json',
-            //     'Authorization' => $server_key
-            // ])->post('https://fcm.googleapis.com/fcm/send', [
-            //     'to'            => '/topics/vehicles',
-            //     'priority'      => 'high',
-            //     'notification'  => [
-            //        'title'      => "Your profile Approved",
-            //        'body'       => 'Congratulations your profile has been approved by Admin'
-            //     ]
-            // ]);
+            $server_key = env('SERVER_KEY');
+            $response = Http::withHeaders([
+                'Content-Type' => 'application/json',
+                'Authorization' => $server_key
+            ])->post('https://fcm.googleapis.com/fcm/send', [
+                'to'            => $graduate->token,
+                'priority'      => 'high',
+                'notification'  => [
+                   'title'      => "You are shot listed",
+                   'body'       => 'Congratulations you are shot listed by '. $company->name
+                ]
+            ]);
 
             $details = [
                 'title'      => 'Short Listed Graduate Mail',
@@ -561,6 +568,15 @@ class AuthController extends Controller
         }
     }
 
+    public function subscriptions(Request $request)
+    {
+        $subscriptions = Subscription::orderBy('id', 'DESC')->get();
+        return response()->json([
+            'status'    => true,
+            'message'   => 'subscriptions List',
+            'data'      => $subscriptions
+        ], 200);
+    }
     public function payment(Request $request)
     {
         // return Payment::all();
