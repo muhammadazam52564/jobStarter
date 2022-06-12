@@ -33,8 +33,7 @@ class MainController extends Controller
     {
         return view('admin.graduates');
     } 
-    
-    new mahj matket
+
 
     public function graduates_list(Request $request)
     {
