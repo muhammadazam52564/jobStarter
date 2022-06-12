@@ -22,8 +22,6 @@ use URL;
 // graduates 2
 // companies 3
 
-
-
 // status
 // 0--- pending approval
 // 1--- Active
@@ -34,7 +32,9 @@ class MainController extends Controller
     public function graduates(Request $request)
     {
         return view('admin.graduates');
-    }
+    } 
+    
+    new mahj matket
 
     public function graduates_list(Request $request)
     {
@@ -173,12 +173,4 @@ class MainController extends Controller
         $subscription = Subscription::find($id)->delete();
         return Redirect::back()->with('msg', 'Subscription deleted Successfully');
     }
-
-
-
-
-
-    // $table->string('name')->nullable();
-    //         $table->float('amount')->nullable();
-    //         $table->string('duration')->nullable();
 }

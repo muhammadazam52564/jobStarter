@@ -19,6 +19,9 @@ class CreatePaymentsTable extends Migration
             $table->foreign('company')->references('id')->on('users')->onDelete('cascade');
             $table->string('transaction_id')->nullable();
             $table->string('description')->nullable();
+            $table->float('amount')->default(0);
+            $table->date('subscription_start')->nullable();
+            $table->date('subscription_expiry')->nullable();
             $table->timestamps();
         });
     }

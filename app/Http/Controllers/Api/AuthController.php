@@ -579,12 +579,12 @@ class AuthController extends Controller
     }
     public function payment(Request $request)
     {
-        // return Payment::all();
         try
         {
             $validator = \Validator::make($request->all(), [
 
                 'company'       => 'required',
+                'subscription'  => 'required',
                 'card_number'   => 'required',
                 'exp_month'     => 'required|min:1|max:2',
                 'exp_year'      => 'required|min:4|max:4',
@@ -627,15 +627,112 @@ class AuthController extends Controller
                     'status'        => $charge->status,
                     'amount'        => $charge->amount / 100 .' '. $charge->currency
                 ];
-                $payment = new Payment;
-                $payment->company        = $request->company;
-                $payment->transaction_id = $charge->id;
-                $payment->description    = 'Subsrciption payment.';
+                $subscription            = Subscription::find($request->subscription);
+
+                if($subscription->type   == 'days') {
+
+                    $date = now();
+                    $date->modify('+'.$subscription->duration.' days')->subDay(1);
+                    $date = $date->format('Y-m-d');
+
+                }
+                else if($subscription->type == 'months'){
+
+                    $date = now();
+                    $date->modify('+'.$subscription->duration.' months')->subDay(1);
+                    $date = $date->format('Y-m-d');
+
+                }                
+                else{
+
+                    $date = now();
+                    $date->modify('+'.$subscription->duration.' years')->subDay(1);
+                    $date = $date->format('Y-m-d');
+
+                }
+                $payment                      = new Payment;
+                $payment->company             = $request->company;
+                
+                $payment->subscription_start  = now()->format('Y-m-d');
+                $payment->subscription_expiry = $date;
+                $payment->transaction_id      = $charge->id;
+                $payment->amount              = $request->amount;
+                $payment->description         = 'Subsrciption payment.'; 
                 $payment->save();
                 return response()->json([
                     'status'    => true,
                     'message'   => "Payment successfully completed",
                     'data'      => $res
+                ], 200);
+            }
+        }catch(\Exception $e){
+
+            return response()->json([
+                'status'    => false,
+                'error'     => $e->getMessage(),
+                'data'      => null
+            ], 400);
+        }
+
+    }
+    public function free_trial(Request $request)
+    {
+        try{
+            $validator = \Validator::make($request->all(), [
+                'company'       => 'required',
+                'subscription'  => 'required',
+            ]);
+            if ($validator->fails()){
+                return response()->json([
+                    'status' => false,
+                    'error' => $validator->errors()->first(),
+                    'data' => null
+                ], 400);
+            }else{
+                $avail_trial = Payment::where('company', $request->company)->where('transaction_id', '1')->count();
+                if ($avail_trial > 0) 
+                {
+                    return response()->json([
+                        'status'    => true,
+                        'message'   => "* You already availed trial now you can buy subscription",
+                        'data'      => null
+                    ], 200);
+                }
+                $subscription            =  Subscription::find($request->subscription);
+                if($subscription->type   == 'days') {
+
+                    $date = now();
+                    $date->modify('+'.$subscription->duration.' days')->subDay(1);
+                    $date = $date->format('Y-m-d');
+
+                }
+                else if($subscription->type == 'months'){
+
+                    $date = now();
+                    $date->modify('+'.$subscription->duration.' months')->subDay(1);
+                    $date = $date->format('Y-m-d');
+
+                }                
+                else{
+
+                    $date = now();
+                    $date->modify('+'.$subscription->duration.' years')->subDay(1);
+                    $date = $date->format('Y-m-d');
+
+                }
+
+                $payment                      = new Payment;
+                $payment->company             = $request->company;
+                
+                $payment->subscription_start  = now()->format('Y-m-d');
+                $payment->subscription_expiry = $date;
+                $payment->transaction_id      = 1;
+                $payment->description         = 'Free trial without payment.'; 
+                $payment->save();
+                return response()->json([
+                    'status'    => true,
+                    'message'   => "Payment successfully completed",
+                    'data'      => null
                 ], 200);
             }
         }catch(\Exception $e){

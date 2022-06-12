@@ -31,9 +31,9 @@
                             <div class="w-50 pl-2">
                                 <label >Duration type</label>
                                 <select name="type" class="form-control">
-                                    <option value="days">Days</option>
-                                    <option value="months">Months</option> 
-                                    <option value="years">Years</option>
+                                    <option {{ $subscription->type == "days"    ? 'selected': "" }} value="days">Days</option>
+                                    <option {{ $subscription->type == "months"  ? 'selected': "" }} value="months">Months</option> 
+                                    <option {{ $subscription->type == "years"   ? 'selected': "" }} value="years">Years</option>
                                 </select>
                             </div>
                         </div>

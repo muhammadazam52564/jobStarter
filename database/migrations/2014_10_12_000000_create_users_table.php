@@ -28,6 +28,7 @@ class CreateUsersTable extends Migration
             $table->string('role')->nullable();
             $table->integer('status')->default(0);
             $table->integer('verified')->default(0);
+            $table->integer('trial_avail')->default(0);
             $table->string('token')->nullable();
 
             $table->timestamp('email_verified_at')->nullable();

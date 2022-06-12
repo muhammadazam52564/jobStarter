@@ -23,9 +23,9 @@ Route::group(['middleware' => 'auth:sanctum'], function(){
     Route::get('/logout/{id}', [AuthController::class, 'signout']);
     Route::get('/notifications/{id}', [AuthController::class, 'notifications']);
     Route::get('/subscriptions', [AuthController::class, 'subscriptions']);
-
-    
+    Route::post('/free-trial', [AuthController::class, 'free_trial']);
     Route::post('/pay', [AuthController::class, 'payment']);
+
 
 
 });
