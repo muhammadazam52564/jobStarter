@@ -36,11 +36,10 @@ class AuthController extends Controller
                 $user->name     = $request->name;
                 $user->email    = $request->email;
                 $user->role     = $request->type;
-                if ($request->type == 'company') {
+                $user->otp      = rand(1000, 9999);
+                if ($request->type == 'company') 
+                {
                     $user->status = 1;
-                    $user->otp      = null;
-                }else{
-                    $user->otp      = 1234;
                 }
                 if( $request->has('token')){
                     $user->token = $request->token;
