@@ -720,6 +720,10 @@ class AuthController extends Controller
 
                 }
 
+                $company                     = User::find($request->company);
+                $company->trial_avail        = 1;
+                $company->save();
+
                 $payment                      = new Payment;
                 $payment->company             = $request->company;
                 
