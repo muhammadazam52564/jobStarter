@@ -22,7 +22,6 @@ Route::group(['prefix'=> 'admin', 'middleware'=>['isAdmin', 'auth', 'PreventBack
     Route::get('/del-graduate/{id}', [MainController::class, 'del_graduates'])->name('admin.del-graduate');
 
     Route::get('/companies', [MainController::class, 'companies'])->name('admin.companies');
-
     Route::get('/get-companies', [MainController::class, 'companies_list'])->name('admin.get-companies');
 
     Route::post('/update-status', [MainController::class, 'update_status'])->name('admin.update-status');
@@ -31,17 +30,26 @@ Route::group(['prefix'=> 'admin', 'middleware'=>['isAdmin', 'auth', 'PreventBack
     Route::get('/add-subscription', [MainController::class, 'add_subscription'])->name('admin.add-subscription');
     Route::post('/new-subscription',    [MainController::class, 'new_subscription'])->name('admin.new-subscription');
 
-
     Route::get('/get-subscriptions', [MainController::class, 'subscriptions_list'])->name('admin.get-subscriptions');
-
     Route::get('/edit-subscription/{id}', [MainController::class, 'edit_subscriptions'])->name('admin.edit-subscription');
     Route::post('/update-subscription/{id}', [MainController::class, 'update_subscription'])->name('admin.update-subscription');
-
     Route::get('/del-subscription/{id}', [MainController::class, 'del_subscription'])->name('admin.del-subscription');
 
-    //
+
+    Route::get('/categories', [MainController::class, 'categories'])->name('admin.categories');
+    Route::get('/add-category', function(){
+        return view('admin.add_category');
+    })->name('admin.add-category');
+    Route::get('/edit-category/{id}', [MainController::class, 'edit_category'])->name('admin.edit-category');
+    Route::post('/update-category/{id}', [MainController::class, 'update_category'])->name('admin.update-category');
+
+
+    Route::get('/del-category/{id}', [MainController::class, 'del_category'])->name('admin.del-category');
+
+
+    Route::post('/add-category',  [MainController::class, 'add_category'])->name('admin.add-category');
+
     // Profile Settings
-    //
     Route::get('/change-password', [AdminController::class, 'change_password'])->name('admin.change-password');
     Route::post('/change-password', [AdminController::class, 'update_password'])->name('admin.change-password');
     Route::get('/change-email', [AdminController::class, 'change_email'])->name('admin.change-email');

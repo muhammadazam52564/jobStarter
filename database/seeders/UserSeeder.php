@@ -14,7 +14,7 @@ class UserSeeder extends Seeder
      */
     public function run(){
         User::create([
-            'name'      => 'Muhammad Azam',
+            'name'      => 'admin',
             'email'     => 'muhammadazam52564@gmail.com',
             'password'  => bcrypt('123456'),
             'email_verified_at' => Carbon::now(),
@@ -22,23 +22,23 @@ class UserSeeder extends Seeder
         ]);
         for ($i=0; $i < 12 ; $i++)
         {
-            User::create([
-                'name'              => 'Muhammad Azam',
-                'email'             => 'muhammadazam2'.$i.'@gmail.com',
-                'password'          => bcrypt('123456'),
-                'email_verified_at' => Carbon::now(),
-                'role'              => 'graduate',
-                'dob'               => Carbon::createFromFormat('m/d/Y', '12/08/2020'),
-            ]);
-            User::create([
-                'name'              => 'Muhammad Azam',
-                'email'             => 'muhammadazam3'.$i.'@gmail.com',
-                'password'          => bcrypt('123456'),
-                'email_verified_at' => Carbon::now(),
-                'role'              => 'company',
-                'status'            => 1,
+            // User::create([
+            //     'name'              => 'Muhammad Azam',
+            //     'email'             => 'muhammadazam2'.$i.'@gmail.com',
+            //     'password'          => bcrypt('123456'),
+            //     'email_verified_at' => Carbon::now(),
+            //     'role'              => 'graduate',
+            //     'dob'               => Carbon::createFromFormat('m/d/Y', '12/08/2020'),
+            // ]);
+            // User::create([
+            //     'name'              => 'Muhammad Azam',
+            //     'email'             => 'muhammadazam3'.$i.'@gmail.com',
+            //     'password'          => bcrypt('123456'),
+            //     'email_verified_at' => Carbon::now(),
+            //     'role'              => 'company',
+            //     'status'            => 1,
 
-            ]);
+            // ]);
         }
     }
 }

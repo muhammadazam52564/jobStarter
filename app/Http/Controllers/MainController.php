@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Http;
 use App\Mail\AccountApproved;
 use App\Models\Notification;
 use App\Models\Subscription;
+use App\Models\Category;
 use App\Models\User;
 use Carbon\Carbon;
 use Redirect;
@@ -33,8 +34,7 @@ class MainController extends Controller
     {
         return view('admin.graduates');
     } 
-
-
+    
     public function graduates_list(Request $request)
     {
         $graduates = User::where('role', 'graduate')->orderBy('id', 'DESC')->get();
@@ -103,7 +103,7 @@ class MainController extends Controller
     }
     public function new_subscription(Request $request)
     {
-        // try{
+        try{
             $validated = $request->validate([
                 'name'      => 'required',
                 'amount'    => 'required',
@@ -123,15 +123,15 @@ class MainController extends Controller
             {
                 return "failed to save";
             }
-        // }
-        // catch(\Exception $e){
+        }
+        catch(\Exception $e){
 
-        //     return response()->json([
-        //         'status'    => false,
-        //         'error'     => $e->getMessage(),
-        //         'data'      => null
-        //     ], 400);
-        // }
+            return response()->json([
+                'status'    => false,
+                'error'     => $e->getMessage(),
+                'data'      => null
+            ], 400);
+        }
     }
 
     public function edit_subscriptions($id)
@@ -171,5 +171,82 @@ class MainController extends Controller
     public function del_subscription($id){
         $subscription = Subscription::find($id)->delete();
         return Redirect::back()->with('msg', 'Subscription deleted Successfully');
+    }
+
+
+    public function categories(Request $request)
+    {
+        $categories = Category::orderBy('id', 'DESC')->get();
+        return view('admin.categories', compact('categories'));
+    }
+
+    public function add_category(Request $request)
+    {
+        try{
+            $validated = $request->validate([
+                'name'    => 'required',
+                'image'   => 'required',
+            ]);
+            $category           = new Category;
+            $category->name     = $request->name;
+            if ($request->has('image')) 
+            {
+                $newfilename        = time() .'.'. $request->image->getClientOriginalExtension();
+                $request->file('image')->move(public_path("categories"), $newfilename);
+                $category->image     = 'categories/'.$newfilename;
+            }
+
+            if ($category->save()) 
+            {
+                return redirect()->route('admin.categories');
+            }
+            else
+            {
+                return back();
+            }
+        }
+        catch(\Exception $e){
+            return back()->with('message',  $e->getMessage());
+        }
+    }
+    public function edit_category($id)
+    {
+        $category = Category::find($id);
+        return view('admin.edit_category', compact('category'));
+    }
+
+    public function update_category(Request $request, $id)
+    {
+        try{
+            $validated = $request->validate([
+                'name'    => 'required'
+            ]);
+            $category           = Category::find($id);
+            $category->name     = $request->name;
+            if ($request->has('image')) 
+            {
+                $newfilename        = time() .'.'. $request->image->getClientOriginalExtension();
+                $request->file('image')->move(public_path("categories"), $newfilename);
+                $category->image     = 'categories/'.$newfilename;
+            }
+
+            if ($category->save()) 
+            {
+                return redirect()->route('admin.categories');
+            }
+            else
+            {
+                return back();
+            }
+        }
+        catch(\Exception $e){
+            return back()->with('message',  $e->getMessage());
+        }
+    }
+
+    public function del_category($id)
+    {
+        $category = Category::find($id)->delete();
+        return back()->with('msg',  "Deleted Successfully");
     }
 }

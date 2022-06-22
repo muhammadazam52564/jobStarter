@@ -18,6 +18,9 @@
             <a href="{{ route('admin.subscriptions') }}">Subscriptions</a>
         </li>
 
+        <li class="{{ Request::is('admin/categories') ? 'li-active':'' }}">
+            <a href="{{ route('admin.categories') }}">Categories</a>
+        </li>
 
         <li>
             <a href="#ProfileSettings" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Profile Settings</a>

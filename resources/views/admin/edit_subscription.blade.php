@@ -45,7 +45,7 @@
                             @enderror
                         </div>
                         <div class="pt-3 w-100">
-                            <button type="submit" class="btn btn-primary">Add Subscription</button>
+                            <button type="submit" class="btn btn-primary">Update Subscription</button>
                         </div>
                     </form>
                 </div>

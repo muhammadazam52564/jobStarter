@@ -56,10 +56,12 @@ return [
             'driver' => 'local',
             'root'   => public_path() . '/profile_images',
         ],
-        'product_images' => [
+        'categories' => [
             'driver' => 'local',
-            'root'   => public_path() . '/product_images',
+            'root'   => public_path() . '/categories',
         ],
+
+        
 
     ],
 

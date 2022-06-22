@@ -6,8 +6,6 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\MainController;
 use Illuminate\Support\Facades\Auth;
 
-
-
 Route::post('/signup', [AuthController::class, 'signup']);
 
 Route::post('/login', [AuthController::class, 'login']);
@@ -19,11 +17,14 @@ Route::group(['middleware' => 'auth:sanctum'], function(){
     Route::post('/update-profile-image', [AuthController::class, 'update_profile_image_by_parts']);
     Route::get('/profile/{id}', [AuthController::class, 'profile']);
     Route::get('/graduates/', [AuthController::class, 'graduates']);
+    Route::get('/categories/', [AuthController::class, 'categories']);
+
+
     Route::post('/send_mail', [AuthController::class, 'send_mail']);
     Route::get('/logout/{id}', [AuthController::class, 'signout']);
     Route::get('/notifications/{id}', [AuthController::class, 'notifications']);
     Route::get('/subscriptions', [AuthController::class, 'subscriptions']);
-    Route::post('/free-trial', [AuthController::class, 'free_trial']);
+    // Route::post('/free-trial', [AuthController::class, 'free_trial']);
     Route::post('/pay', [AuthController::class, 'payment']);
 
 

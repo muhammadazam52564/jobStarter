@@ -50,5 +50,11 @@ class User extends Authenticatable
         return $this->hasMany(Payment::class, 'company');
     }
 
+    public function category()
+    {
+        return $this->belongsTo(Category::class, 'category_id');
+    }
+    
+
     
 }

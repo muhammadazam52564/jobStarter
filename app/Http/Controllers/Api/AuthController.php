@@ -8,12 +8,13 @@ use App\Models\Subscription;
 use App\Models\Notification;
 use Illuminate\Support\Str;
 use App\Mail\ShortListed;
+use App\Models\Category;
 use App\Models\Payment;
 use App\Mail\OtpMail;
 use App\Models\User;
 use Carbon\Carbon;
 use Stripe;
-
+use Http;
 class AuthController extends Controller
 {
     public function signup(Request $request){
@@ -56,6 +57,20 @@ class AuthController extends Controller
                 $user->password = bcrypt($request->password);
                 if ( $user->save()) {
                     \Mail::to($request->email)->send(new OtpMail($details));
+
+                    if ($request->type == 'company') 
+                    {
+                        $date = now();
+                        $date->modify('+6 days');
+                        $date                         = $date->format('Y-m-d');           
+                        $payment                      = new Payment;
+                        $payment->company             = $user->id;
+                        $payment->subscription_start  = now()->format('Y-m-d');
+                        $payment->subscription_expiry = $date;
+                        $payment->transaction_id      = 1;
+                        $payment->description         = 'Free trial without payment!'; 
+                        $payment->save();
+                    }
                     $token = $user->createToken('my-app-token')->plainTextToken;
                     return response()->json([
                         'status'    => true,
@@ -126,7 +141,7 @@ class AuthController extends Controller
                 'email'     => 'required',
                 'password'  => 'required',
             ]);
-            if ($validator->fails()) {
+            if ($validator->fails()){
                 return response()->json([
                     'status'    => false,
                     'error'     => $validator->errors()->first(),
@@ -135,18 +150,22 @@ class AuthController extends Controller
             }else{
                 if (auth()->attempt(['email' => $request->email, 'password' => $request->password]))
                 {
-                    $user = auth()->user();
+                    $user = User::with('category')->where('id', auth()->user()->id)->first();
                     $token = $user->createToken('my-app-token')->plainTextToken;
-                    if( $request->has('token')){
+                    if( $request->has('token'))
+                    {
                         $user->token = $request->token;
                         $user->save();
                     }
-
+                    if ($user->type == 'company') {
+                        $payment = Payment::where('company', $user->id)->orderBy('id', 'DESC')->first();
+                        $user()->subscription_expiry = $payment->subscription_expiry;
+                    }
                     return response()->json([
                         'status'    => true,
-                        'message'   => 'Successfully Loged In',
+                        'message'   => 'Successfully Loged In!',
                         'token'     => $token,
-                        'data'      => auth()->user()->makeHidden(['created_at', 'updated_at', 'otp', 'email_verified_at']),
+                        'data'      => $user->makeHidden(['created_at', 'updated_at', 'otp', 'email_verified_at', "token"]),
                     ], 200);
                 }else{
                     return response()->json([
@@ -251,6 +270,10 @@ class AuthController extends Controller
                     }
                     if($request->has('description')){
                         $user->description = $request->description;
+                    }
+                    if($request->has('category_id')){
+
+                        $user->category_id = $request->category_id;
                     }
                     if($user->save()){
                         $user = User::find($request->user_id);
@@ -410,11 +433,11 @@ class AuthController extends Controller
 
     public function profile($id){
         try{
-            $user = User::find($id);
+            $user = User::with('category')->find($id);
             return response()->json([
                 'status'    => true,
                 'message'   => "User Information",
-                'data'      => $user->makeHidden(["role", "status", "verified", "otp", "created_at", "updated_at", 'email_verified_at' ])
+                'data'      => $user->makeHidden(["status", "verified", "otp", "created_at", "updated_at", 'email_verified_at', "category_id", "token"])
             ], 400);
 
         }catch(\Exception $e)
@@ -567,6 +590,16 @@ class AuthController extends Controller
         }
     }
 
+    public function categories(Request $request)
+    {
+        $category = Category::orderBy('id', 'DESC')->get();
+        return response()->json([
+            'status'    => true,
+            'message'   => 'Category List',
+            'data'      => $category
+        ], 200);
+    }
+
     public function subscriptions(Request $request)
     {
         $subscriptions = Subscription::orderBy('id', 'DESC')->get();
@@ -674,80 +707,65 @@ class AuthController extends Controller
         }
 
     }
-    public function free_trial(Request $request)
-    {
-        try{
-            $validator = \Validator::make($request->all(), [
-                'company'       => 'required',
-                'subscription'  => 'required',
-            ]);
-            if ($validator->fails()){
-                return response()->json([
-                    'status' => false,
-                    'error' => $validator->errors()->first(),
-                    'data' => null
-                ], 400);
-            }else{
-                $avail_trial = Payment::where('company', $request->company)->where('transaction_id', '1')->count();
-                if ($avail_trial > 0) 
-                {
-                    return response()->json([
-                        'status'    => true,
-                        'message'   => "* You already availed trial now you can buy subscription",
-                        'data'      => null
-                    ], 200);
-                }
-                $subscription            =  Subscription::find($request->subscription);
-                if($subscription->type   == 'days') {
+    // public function free_trial(Request $request)
+    // {
+    //     try{
+    //         $validator = \Validator::make($request->all(), [
+    //             'company'       => 'required',
+    //             'subscription'  => 'required',
+    //         ]);
+    //         if ($validator->fails()){
+    //             return response()->json([
+    //                 'status' => false,
+    //                 'error' => $validator->errors()->first(),
+    //                 'data' => null
+    //             ], 400);
+    //         }else{
+    //             $avail_trial = Payment::where('company', $request->company)->where('transaction_id', '1')->count();
+    //             if ($avail_trial > 0) 
+    //             {
+    //                 return response()->json([
+    //                     'status'    => true,
+    //                     'message'   => "* You already availed trial now you can buy subscription",
+    //                     'data'      => null
+    //                 ], 200);
+    //             }
+    //             $subscription            =  Subscription::find($request->subscription);
+    //             if($subscription->type   == 'days') {
 
-                    $date = now();
-                    $date->modify('+'.$subscription->duration.' days')->subDay(1);
-                    $date = $date->format('Y-m-d');
+    //                 $date = now();
+    //                 $date->modify('+'.$subscription->duration.' days')->subDay(1);
+    //                 $date = $date->format('Y-m-d');
 
-                }
-                else if($subscription->type == 'months'){
+    //             }              
+    //             $company                     = User::find($request->company);
+    //             $company->trial_avail        = 1;
+    //             $company->save();
 
-                    $date = now();
-                    $date->modify('+'.$subscription->duration.' months')->subDay(1);
-                    $date = $date->format('Y-m-d');
-
-                }                
-                else{
-
-                    $date = now();
-                    $date->modify('+'.$subscription->duration.' years')->subDay(1);
-                    $date = $date->format('Y-m-d');
-
-                }
-
-                $company                     = User::find($request->company);
-                $company->trial_avail        = 1;
-                $company->save();
-
-                $payment                      = new Payment;
-                $payment->company             = $request->company;
+    //             $payment                      = new Payment;
+    //             $payment->company             = $request->company;
                 
-                $payment->subscription_start  = now()->format('Y-m-d');
-                $payment->subscription_expiry = $date;
-                $payment->transaction_id      = 1;
-                $payment->description         = 'Free trial without payment.'; 
-                $payment->save();
-                return response()->json([
-                    'status'    => true,
-                    'message'   => "Payment successfully completed",
-                    'data'      => null
-                ], 200);
-            }
-        }catch(\Exception $e){
+    //             $payment->subscription_start  = now()->format('Y-m-d');
+    //             $payment->subscription_expiry = $date;
+    //             $payment->transaction_id      = 1;
+    //             $payment->description         = 'Free trial without payment.'; 
+    //             $payment->save();
+    //             return response()->json([
+    //                 'status'    => true,
+    //                 'message'   => "Payment successfully completed",
+    //                 'data'      => null
+    //             ], 200);
+    //         }
+    //     }catch(\Exception $e){
 
-            return response()->json([
-                'status'    => false,
-                'error'     => $e->getMessage(),
-                'data'      => null
-            ], 400);
-        }
+    //         return response()->json([
+    //             'status'    => false,
+    //             'error'     => $e->getMessage(),
+    //             'data'      => null
+    //         ], 400);
+    //     }
 
-    }
+    // }
 
 }
 
