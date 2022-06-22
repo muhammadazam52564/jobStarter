@@ -157,9 +157,10 @@ class AuthController extends Controller
                         $user->token = $request->token;
                         $user->save();
                     }
-                    if ($user->type == 'company') {
+                    if ($user->role == 'company' && Payment::where('company', $user->id)->count() > 0) {
                         $payment = Payment::where('company', $user->id)->orderBy('id', 'DESC')->first();
-                        $user()->subscription_expiry = $payment->subscription_expiry;
+                        // return $payment;
+                        $user->subscription_expiry = $payment->subscription_expiry;
                     }
                     return response()->json([
                         'status'    => true,
