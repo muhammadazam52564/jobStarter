@@ -1,6 +1,6 @@
 @extends('layouts.admin.app')
 @section('title')
-    Subscriptions
+    Categories
 @endsection
 @section('content')
     <div class="container">
