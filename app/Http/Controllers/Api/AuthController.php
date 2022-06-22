@@ -455,7 +455,7 @@ class AuthController extends Controller
 
     public function graduates(Request $request){
         try{
-            $user = User::where('role', 'graduate')->select("id", "name", "email", "profile_image", "school", "address", "description", "dob")->get();
+            $user = User::where('status', 1)->where('role', 'graduate')->select("id", "name", "email", "profile_image", "school", "address", "description", "dob")->get();
 
             return response()->json([
                 'status'    => true,

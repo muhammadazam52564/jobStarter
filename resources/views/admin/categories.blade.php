@@ -26,17 +26,16 @@
                     </thead>
                     <tbody id="companies_list">
                         @foreach($categories as $category)
+                        <tr>
                             <td>{{ $category->name }}</td>
                             <td>
                                 <img src="../{{ $category->image }}" style="max-width: 100px" />
                             </td>
                             <td style="min-width: 160px" >
-
-                            <a href="{{ route('admin.del-category', $category->id) }}" class="btn btn-sm btn-danger fa fa-trash mr-2"></button>
-                            <a href="{{ route('admin.edit-category', $category->id) }}" class="btn btn-sm btn-primary fa fa-edit"></a>
-
-
+                                <a href="{{ route('admin.del-category', $category->id) }}" class="btn btn-sm btn-danger fa fa-trash mr-2"></button>
+                                <a href="{{ route('admin.edit-category', $category->id) }}" class="btn btn-sm btn-primary fa fa-edit"></a>
                             </td>
+                        </tr>
                         @endforeach
                     </tbody>
                 </table>
